@@ -10,7 +10,6 @@ import 'package:invoice/utils/extensions.dart';
 import 'package:invoice/utils/routes.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../camera/widgets/multiple_image_camera.dart';
 import 'invoice_controller.dart';
 
 class InvoiceScreen extends StatelessWidget {
