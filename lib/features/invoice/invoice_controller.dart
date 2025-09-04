@@ -30,19 +30,19 @@ class InvoiceController extends GetxController {
       try {
         final List<int> imageBytes = await imageFile.readAsBytes();
         //Load the image using PdfBitmap object
-        final PdfBitmap image = PdfBitmap(imageBytes);
+        final PdfImage image = PdfBitmap(imageBytes);
         //Add a new page and draw the image
-        document.pages.add().graphics.drawImage(
-          image,
-          Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-        );
-        // You might want to scale the image to fit the page:
-        // final PdfPage page = document.pages.add();
-        // final Size pageSize = page.getClientSize();
-        // page.graphics.drawImage(
+        // document.pages.add().graphics.drawImage(
         //   image,
-        //   Rect.fromLTWH(0, 0, pageSize.width, pageSize.height), // Example: fit to page
+        //   Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
         // );
+        // You might want to scale the image to fit the page:
+        final PdfPage page = document.pages.add();
+        final Size pageSize = page.getClientSize();
+        page.graphics.drawImage(
+          image,
+          Rect.fromLTWH(0, 0, pageSize.width, pageSize.height), // Example: fit to page
+        );
       } catch (e) {
         debugPrint(
           "Error processing image ${imageFile.path} with Syncfusion: $e",
