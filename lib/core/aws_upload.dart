@@ -7,8 +7,8 @@ class AwsUpload {
 
   Future<String> uploadFile({required File file}) async {
     return await AwsS3.uploadFile(
-        accessKey: storage.read('AccessKey'),
-        secretKey: storage.read('SecretKey'),
+        accessKey: storage.read('AK'),
+        secretKey: storage.read('SK'),
         file: file,
         bucket: "zerosnap-storage-invoiceapp",
         region: "ca-central-1",

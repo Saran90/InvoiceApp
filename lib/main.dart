@@ -8,8 +8,8 @@ void main() {
   storage = GetStorage();
   storage.initStorage.then((value) {
     if(value) {
-      storage.write('AccessKey', 'AKIARVO6ZMZNSLP5T6D5');
-      storage.write('SecretKey', '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');
+      storage.write('AK', 'AKIARVO6ZMZNSLP5T6D5');
+      storage.write('SK', 'o1jtruGqOd/jWb2+wZoavB2aX/vFBNwemKQdU1I+');
     }
   },);
 }
