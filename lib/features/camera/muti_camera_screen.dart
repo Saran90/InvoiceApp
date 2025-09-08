@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:invoice/features/camera/widgets/multi_camera_preview.dart';
+import 'package:invoice/utils/routes.dart';
 
 import 'models/media_model.dart';
 import 'multi_camera_controller.dart';
@@ -39,61 +41,14 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        actions: [
-          Obx(
-            () =>
-                _controller.imageFiles.isNotEmpty
-                    ? GestureDetector(
-                      onTap: () {
-                        for (
-                          int i = 0;
-                          i < _controller.imageFiles.length;
-                          i++
-                        ) {
-                          File file = File(_controller.imageFiles[i].path);
-                          _controller.imageList.add(
-                            MediaModel.blob(file, "", file.readAsBytesSync()),
-                          );
-                        }
-                        Get.back(result: _controller.imageList);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: _animatedButton(customContent: Text('Done')),
-                      ),
-                    )
-                    : const SizedBox(),
-          ),
-        ],
+        actions: [],
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.black,
       extendBody: false,
       body: _buildCameraPreview(),
     );
-  }
-
-  Widget? _animatedButton({Widget? customContent}) {
-    return customContent ??
-        Container(
-          height: 40,
-          width: 80,
-          decoration: BoxDecoration(
-            color: Colors.white38,
-            borderRadius: BorderRadius.circular(100.0),
-          ),
-          child: const Center(
-            child: Text(
-              'Done',
-              style: TextStyle(
-                fontSize: 15.0,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ),
-        );
   }
 
   Widget _buildCameraPreview() {
@@ -116,15 +71,13 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
               Obx(
                 () =>
                     (_controller.cameraController.value != null)
-                        ? Expanded(
-                          child: Center(
-                            child: MultiCameraPreview(),
-                          ),
-                        )
+                        ? Expanded(child: Center(child: MultiCameraPreview()))
                         : Expanded(child: Container()),
               ),
-              SizedBox(
+              const SizedBox(height: 10),
+              Container(
                 height: 100,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: _controller.imageFiles.length,
@@ -134,19 +87,14 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
                         Container(
                           alignment: Alignment.bottomLeft,
                           // ignore: unnecessary_null_comparison
-                          child:
-                          ScaleTransition(
+                          child: ScaleTransition(
                             scale: _controller.scaleAnimation.value!,
                             child: GestureDetector(
                               onTap: () {},
                               child: Stack(
                                 children: [
                                   Image.file(
-                                    File(
-                                      _controller
-                                          .imageFiles[index]
-                                          .path,
-                                    ),
+                                    File(_controller.imageFiles[index].path),
                                     height: 90,
                                     width: 60,
                                   ),
@@ -157,10 +105,15 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
                                       onTap: () {
                                         _controller.removeImage(index);
                                       },
-                                      child: Image.network(
-                                        "https://logowik.com/content/uploads/images/close1437.jpg",
-                                        height: 30,
-                                        width: 30,
+                                      child: CircleAvatar(
+                                        radius: 15,
+                                        backgroundColor: Colors.white,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.close,
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -169,6 +122,7 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(width: 10),
                       ],
                     );
                   }),
@@ -177,95 +131,101 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: IconButton(
-                          iconSize: 40,
-                          icon: const Icon(
-                            Icons.camera_front,
-                            color: Colors.white,
+                child: SafeArea(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: InkWell(
+                            onTap: _controller.onCameraSwitch,
+                            child: SizedBox(
+                              width: 80,
+                              height: 80,
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  'assets/icons/ic_camera.svg',
+                                  width: 50,
+                                  height: 50,
+                                ),
+                              ),
+                            ),
                           ),
-                          onPressed: _controller.onCameraSwitch,
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: SafeArea(
-                        child: IconButton(
-                          iconSize: 80,
-                          icon: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            transitionBuilder:
-                                (child, anim) => RotationTransition(
-                                  turns:
-                                      child.key == const ValueKey('icon1')
-                                          ? Tween<double>(
-                                            begin: 1,
-                                            end: 0.75,
-                                          ).animate(anim)
-                                          : Tween<double>(
-                                            begin: 0.75,
-                                            end: 1,
-                                          ).animate(anim),
-                                  child: ScaleTransition(
-                                    scale: anim,
-                                    child: child,
-                                  ),
-                                ),
-                            child:
-                                _controller.currIndex.value == 0
-                                    ? Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.white),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      key: const ValueKey("icon1"),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(2.0),
-                                        child: Container(
-                                          height: 50,
-                                          width: 50,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                    : Container(
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.white),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      key: const ValueKey("icon2"),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(2.0),
-                                        child: Container(
-                                          height: 50,
-                                          width: 50,
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                          ),
-                          onPressed: () {
+                      Align(
+                        alignment: Alignment.center,
+                        child: InkWell(
+                          onTap: () {
                             _controller.currIndex.value =
                                 _controller.currIndex.value == 0 ? 1 : 0;
                             _controller.takePicture();
                           },
+                          child: SizedBox(
+                            width: 80,
+                            height: 80,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                'assets/icons/ic_shutter.svg',
+                                width: 50,
+                                height: 50,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      _controller.imageFiles.isNotEmpty
+                          ? Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 20),
+                              child: InkWell(
+                                onTap: () {
+                                  for (
+                                    int i = 0;
+                                    i < _controller.imageFiles.length;
+                                    i++
+                                  ) {
+                                    File file = File(
+                                      _controller.imageFiles[i].path,
+                                    );
+                                    _controller.imageList.add(
+                                      MediaModel.blob(
+                                        file,
+                                        "",
+                                        file.readAsBytesSync(),
+                                      ),
+                                    );
+                                  }
+                                  var list = _controller.imageList;
+                                  if (_controller.isFromInvoice.value) {
+                                    Get.back(result: list);
+                                  } else {
+                                    Get.offAndToNamed(
+                                      invoiceRoute,
+                                      arguments: list,
+                                    );
+                                  }
+                                },
+                                child: SizedBox(
+                                  width: 80,
+                                  height: 80,
+                                  child: Center(
+                                    child: SvgPicture.asset(
+                                      'assets/icons/ic_next.svg',
+                                      width: 50,
+                                      height: 50,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                          : const SizedBox(),
+                    ],
+                  ),
                 ),
               ),
             ],

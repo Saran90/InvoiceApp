@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:invoice/core/aws_upload.dart';
 import 'package:invoice/features/camera/models/media_model.dart';
 import 'package:invoice/utils/extensions.dart';
 import 'package:invoice/utils/routes.dart';
@@ -20,117 +22,160 @@ class InvoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Invoice')),
-      floatingActionButton: _controller.images.isEmpty?FloatingActionButton(onPressed: () async {
-        List<MediaModel>? files =
-            await Get.toNamed(multiCameraRoute) as List<MediaModel>?;
-        if (files != null) {
-          _controller.images.value =
-              files.map((e) => File(e.file.path)).toList();
-          _controller.selectedImage.value = _controller.images.first;
-        }
-      },child: Icon(Icons.add),):null,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Obx(
-                () =>
-                    _controller.selectedImage.value != null
-                        ? SizedBox(
-                          height: double.infinity,
-                          width: double.infinity,
-                          child: Image.file(_controller.selectedImage.value!),
-                        )
-                        : SizedBox(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Obx(
-              () => SizedBox(
-                height: 300,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _controller.images.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        _controller.selectedImage.value =
-                            _controller.images[index];
-                      },
-                      child: SizedBox(
-                        height: 300,
-                        width: 200,
-                        child: Image.file(_controller.images[index]),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    'Invoice',
+                    style: TextStyle(fontSize: 27, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 20),
                   Expanded(
-                    child: Obx(
-                      () => Visibility(
-                        visible: _controller.images.isNotEmpty,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            var pdf = await _controller.saveToPdf();
-                            if (pdf != null) {
-                              if (await _checkPermission(context)) {
-                                await savePdf(pdf);
-                                _showMessage(context, 'Pdf saved');
-                                _controller.images.clear();
-                                _controller.selectedImage.value = null;
-                              }
-                            }
-                            // _showPdf(context, pdf);
-                          },
-                          child: Center(child: Text('Finish')),
+                    child: SingleChildScrollView(
+                      child: Obx(
+                        () => Wrap(
+                          direction: Axis.horizontal,
+                          runSpacing: 10,
+                          spacing: 10,
+                          children: [
+                            ..._controller.images.map(
+                              (element) => InkWell(
+                                onTap: () {
+                                  _controller.selectedImage.value = element;
+                                },
+                                child: SizedBox(
+                                  height: 200,
+                                  width: 163,
+                                  child: Image.file(element),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Obx(
-                      () => Visibility(
-                        visible: _controller.images.isNotEmpty,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            var pdf = await _controller.saveToPdf();
-                            if (pdf != null) {
-                              if (await _checkPermission(context)) {
-                                await savePdf(pdf);
-                                _showMessage(context, 'Pdf saved');
-                                _controller.images.clear();
-                                _controller.selectedImage.value = null;
-                                List<MediaModel>? files =
-                                await Get.toNamed(multiCameraRoute) as List<MediaModel>?;
-                                if (files != null) {
-                                  _controller.images.value =
-                                      files.map((e) => File(e.file.path)).toList();
-                                  _controller.selectedImage.value = _controller.images.first;
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Container(
+                      height: 150,
+                      color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () async {
+                              _controller.isLoading.value = true;
+                              var pdf = await _controller.saveToPdf();
+                              if (pdf != null) {
+                                if (await _checkPermission(context)) {
+                                  await savePdf(pdf);
+                                  _showMessage(context, 'Pdf saved');
+                                  _controller.images.clear();
+                                  _controller.selectedImage.value = null;
+                                  Get.offAndToNamed(homeRoute);
                                 }
                               }
-                            }
-                            // _showPdf(context, pdf);
-                          },
-                          child: Center(child: Text('Finish and Next')),
-                        ),
+                              _controller.isLoading.value = false;
+                            },
+                            child: SizedBox(
+                              height: 65,
+                              width: 250,
+                              child: Stack(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/images/ic_button.svg',
+                                    height: 65,
+                                    width: 250,
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Finish',
+                                      style: TextStyle(
+                                        fontSize: 27,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              _controller.isLoading.value = true;
+                              var pdf = await _controller.saveToPdf();
+                              if (pdf != null) {
+                                if (await _checkPermission(context)) {
+                                  await savePdf(pdf);
+                                  _showMessage(context, 'Pdf saved');
+                                  _controller.images.clear();
+                                  _controller.selectedImage.value = null;
+                                  List<MediaModel>? files =
+                                      await Get.toNamed(
+                                            multiCameraRoute,
+                                            arguments: {'from': 'invoice'},
+                                          )
+                                          as List<MediaModel>?;
+                                  if (files != null) {
+                                    _controller.images.value =
+                                        files
+                                            .map((e) => File(e.file.path))
+                                            .toList();
+                                    _controller.selectedImage.value =
+                                        _controller.images.first;
+                                  }
+                                }
+                              }
+                              _controller.isLoading.value = false;
+                            },
+                            child: SizedBox(
+                              height: 65,
+                              width: 250,
+                              child: Stack(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/images/ic_button.svg',
+                                    height: 65,
+                                    width: 250,
+                                  ),
+                                  Align(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Finish & New',
+                                      style: TextStyle(
+                                        fontSize: 27,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+              Obx(
+                () =>
+                    _controller.isLoading.value
+                        ? Center(child: CircularProgressIndicator())
+                        : const SizedBox(),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -244,13 +289,21 @@ class InvoiceScreen extends StatelessWidget {
   }
 
   Future<void> savePdf(File? pdf) async {
-    Directory directory = Directory('/storage/emulated/0');
-    Directory appDirectory = Directory('${directory.path}/Invoice');
-    if (!appDirectory.existsSync()) {
-      appDirectory.create(recursive: true);
+    try {
+      Directory directory = Directory('/storage/emulated/0');
+      Directory appDirectory = Directory('${directory.path}/Invoice');
+      if (!appDirectory.existsSync()) {
+        appDirectory.create(recursive: true);
+      }
+      String fileName = 'invoice.pdf';
+      await moveFile(pdf!, '${appDirectory.path}/$fileName');
+      String url = await AwsUpload().uploadFile(
+        file: File('${appDirectory.path}/$fileName'),
+      );
+      debugPrint('Save AWS URL: $url');
+    } catch (exception) {
+      debugPrint('Exception: ${exception.toString()}');
     }
-    String fileName = '${DateTime.now().millisecondsSinceEpoch.toString()}.pdf';
-    moveFile(pdf!, '${appDirectory.path}/$fileName');
   }
 
   Future<File> moveFile(File sourceFile, String newPath) async {

@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Timer(const Duration(seconds: 3), () {
-      Get.offAndToNamed(invoiceRoute);
+      Get.offAndToNamed(homeRoute);
     });
     super.initState();
   }

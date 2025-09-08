@@ -8,6 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:get/get.dart';
 
+import '../camera/models/media_model.dart';
+
 class InvoiceController extends GetxController {
   RxList<File> images = <File>[].obs;
   Rx<File?> selectedImage = Rx<File?>(null);
@@ -16,6 +18,18 @@ class InvoiceController extends GetxController {
   RxInt pages = 0.obs;
   RxInt currentPage = 0.obs;
   RxBool isReady = false.obs;
+  RxBool isLoading = false.obs;
+
+  @override
+  void onInit() {
+    List<MediaModel>? files = Get.arguments as List<MediaModel>?;
+    if (files != null) {
+      images.value =
+          files.map((e) => File(e.file.path)).toList();
+      selectedImage.value = images.first;
+    }
+    super.onInit();
+  }
 
   Future<File?> saveToPdf() async {
     if (images.isEmpty) {
@@ -41,7 +55,12 @@ class InvoiceController extends GetxController {
         final Size pageSize = page.getClientSize();
         page.graphics.drawImage(
           image,
-          Rect.fromLTWH(0, 0, pageSize.width, pageSize.height), // Example: fit to page
+          Rect.fromLTWH(
+            0,
+            0,
+            pageSize.width,
+            pageSize.height,
+          ), // Example: fit to page
         );
       } catch (e) {
         debugPrint(
@@ -57,7 +76,7 @@ class InvoiceController extends GetxController {
       document.dispose();
 
       //Get the temporary directory.
-      var outputFileName = 'Invoice';
+      var outputFileName = 'invoice';
       final directory = await getTemporaryDirectory();
       final path = directory.path;
       final file = File('$path/$outputFileName.pdf');

@@ -22,9 +22,15 @@ class MultiCameraController extends GetxController
   late AnimationController animationController;
   late AnimationController controller;
   Rx<Animation<double>?> scaleAnimation = Rx<Animation<double>?>(null);
+  RxBool isFromInvoice = false.obs;
 
   @override
   void onInit() {
+    imageFiles.value = [];
+    var from = Get.arguments as Map<String, dynamic>?;
+    if(from != null) {
+      isFromInvoice.value = (from['from'] == 'invoice');
+    }
     _initCamera();
     currIndex.value = 0;
     super.onInit();
@@ -114,6 +120,8 @@ class MultiCameraController extends GetxController
     } else {
       animationController.dispose();
     }
+    imageFiles.clear();
+    imageList.clear();
     super.dispose();
   }
 }
