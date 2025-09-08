@@ -4,13 +4,13 @@ import 'package:aws_s3_upload_lite/enum/acl.dart';
 import 'package:flutter/foundation.dart';
 
 class AwsUpload {
-  final String SECRET_KEY = 'o1jtruGqOd/jWb2+wZoavB2aX/vFBNwemKQdU1I+';
-  final String ACCESS_KEY = 'AKIARVO6ZMZNSLP5T6D5';
+  final String SK = 'o1jtruGqOd/jWb2+wZoavB2aX/vFBNwemKQdU1I+';
+  final String AK = 'AKIARVO6ZMZNSLP5T6D5';
 
   Future<String> uploadFile({required File file}) async {
     return await AwsS3.uploadFile(
-        accessKey: ACCESS_KEY,
-        secretKey: SECRET_KEY,
+        accessKey: AK,
+        secretKey: SK,
         file: file,
         bucket: "zerosnap-storage-invoiceapp",
         region: "ca-central-1",
