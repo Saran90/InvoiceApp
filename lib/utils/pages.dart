@@ -4,6 +4,8 @@ import 'package:invoice/features/camera/multi_camera_binding.dart';
 import 'package:invoice/features/camera/muti_camera_screen.dart';
 import 'package:invoice/features/home/home_binding.dart';
 import 'package:invoice/features/home/home_screen.dart';
+import 'package:invoice/features/image_view/image_view_binding.dart';
+import 'package:invoice/features/image_view/image_view_screen.dart';
 import 'package:invoice/utils/routes.dart';
 
 import '../features/invoice/invoice_binding.dart';
@@ -44,6 +46,15 @@ final routes = [
         () => Directionality(
           textDirection: TextDirection.ltr,
           child: HomeScreen(),
+        ),
+  ),
+  GetPage(
+    name: imageViewRoute,
+    binding: ImageViewBinding(),
+    page:
+        () => Directionality(
+          textDirection: TextDirection.ltr,
+          child: ImageViewScreen(),
         ),
   ),
 ];

@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:invoice/api/api.dart';
 import 'package:invoice/core/aws_upload.dart';
 import 'package:invoice/features/camera/models/media_model.dart';
 import 'package:invoice/utils/extensions.dart';
@@ -22,6 +24,7 @@ class InvoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -47,10 +50,14 @@ class InvoiceScreen extends StatelessWidget {
                               (element) => InkWell(
                                 onTap: () {
                                   _controller.selectedImage.value = element;
+                                  Get.toNamed(
+                                    imageViewRoute,
+                                    arguments: _controller.selectedImage.value,
+                                  );
                                 },
                                 child: SizedBox(
-                                  height: 200,
-                                  width: 163,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
                                   child: Image.file(element),
                                 ),
                               ),
@@ -75,11 +82,7 @@ class InvoiceScreen extends StatelessWidget {
                               var pdf = await _controller.saveToPdf();
                               if (pdf != null) {
                                 if (await _checkPermission(context)) {
-                                  await savePdf(pdf);
-                                  _showMessage(context, 'Pdf saved');
-                                  _controller.images.clear();
-                                  _controller.selectedImage.value = null;
-                                  Get.offAndToNamed(homeRoute);
+                                  await _controller.savePdf(context, pdf, true);
                                 }
                               }
                               _controller.isLoading.value = false;
@@ -115,27 +118,9 @@ class InvoiceScreen extends StatelessWidget {
                               var pdf = await _controller.saveToPdf();
                               if (pdf != null) {
                                 if (await _checkPermission(context)) {
-                                  await savePdf(pdf);
-                                  _showMessage(context, 'Pdf saved');
-                                  _controller.images.clear();
-                                  _controller.selectedImage.value = null;
-                                  List<MediaModel>? files =
-                                      await Get.toNamed(
-                                            multiCameraRoute,
-                                            arguments: {'from': 'invoice'},
-                                          )
-                                          as List<MediaModel>?;
-                                  if (files != null) {
-                                    _controller.images.value =
-                                        files
-                                            .map((e) => File(e.file.path))
-                                            .toList();
-                                    _controller.selectedImage.value =
-                                        _controller.images.first;
-                                  }
+                                  _controller.savePdf(context, pdf, false);
                                 }
                               }
-                              _controller.isLoading.value = false;
                             },
                             child: SizedBox(
                               height: 65,
@@ -171,7 +156,19 @@ class InvoiceScreen extends StatelessWidget {
               Obx(
                 () =>
                     _controller.isLoading.value
-                        ? Center(child: CircularProgressIndicator())
+                        ? Center(
+                          child: CircularProgressIndicator(
+                            value:
+                                _controller
+                                    .uploadProgress
+                                    .value, // 70% progress
+                            backgroundColor: Colors.grey,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).primaryColor,
+                            ),
+                            strokeWidth: 8.0,
+                          ),
+                        )
                         : const SizedBox(),
               ),
             ],
@@ -288,37 +285,21 @@ class InvoiceScreen extends StatelessWidget {
     return false;
   }
 
-  Future<void> savePdf(File? pdf) async {
-    try {
-      Directory directory = Directory('/storage/emulated/0');
-      Directory appDirectory = Directory('${directory.path}/Invoice');
-      if (!appDirectory.existsSync()) {
-        appDirectory.create(recursive: true);
-      }
-      String fileName = 'invoice.pdf';
-      await moveFile(pdf!, '${appDirectory.path}/$fileName');
-      String url = await AwsUpload().uploadFile(
-        file: File('${appDirectory.path}/$fileName'),
-      );
-      debugPrint('Save AWS URL: $url');
-    } catch (exception) {
-      debugPrint('Exception: ${exception.toString()}');
-    }
-  }
-
-  Future<File> moveFile(File sourceFile, String newPath) async {
-    try {
-      // prefer using rename as it is probably faster
-      return await sourceFile.rename(newPath);
-    } on FileSystemException catch (e) {
-      // if rename fails, copy the source file and then delete it
-      final newFile = await sourceFile.copy(newPath);
-      await sourceFile.delete();
-      return newFile;
-    }
-  }
-
   void _showMessage(BuildContext context, String message) {
     context.showMessage(message);
   }
+}
+
+class IsolateParams {
+  ReceivePort receivePort;
+  String filePath;
+  String presignedUrl;
+  String contentType;
+
+  IsolateParams({
+    required this.receivePort,
+    required this.filePath,
+    required this.presignedUrl,
+    required this.contentType,
+  });
 }

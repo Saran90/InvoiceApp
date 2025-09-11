@@ -2,6 +2,7 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import "package:camera/camera.dart";
+import 'package:get_storage/get_storage.dart';
 
 import 'models/media_model.dart';
 
@@ -27,6 +28,7 @@ class MultiCameraController extends GetxController
   @override
   void onInit() {
     imageFiles.value = [];
+    imageList = [];
     var from = Get.arguments as Map<String, dynamic>?;
     if(from != null) {
       isFromInvoice.value = (from['from'] == 'invoice');
