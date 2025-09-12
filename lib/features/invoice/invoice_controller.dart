@@ -118,6 +118,7 @@ class InvoiceController extends GetxController {
       } else {
         _showMessage(context, 'PDF not generated');
       }
+      isLoading.value = false;
     } catch (exception) {
       debugPrint('Exception: ${exception.toString()}');
       isLoading.value = false;
@@ -141,7 +142,7 @@ class InvoiceController extends GetxController {
   }
 
   Future<void> uploadComplete() async {
-    images.clear();
+    images.value = [];
     selectedImage.value = null;
     List<MediaModel>? files =
         await Get.toNamed(multiCameraRoute, arguments: {'from': 'invoice'})
@@ -154,7 +155,7 @@ class InvoiceController extends GetxController {
 
   void uploadCompleteAndClose(BuildContext context) {
     _showMessage(context, 'Uploaded');
-    images.clear();
+    images.value = [];
     selectedImage.value = null;
     Get.offAndToNamed(homeRoute);
   }

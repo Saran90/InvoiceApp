@@ -162,11 +162,12 @@ class InvoiceScreen extends StatelessWidget {
                                 _controller
                                     .uploadProgress
                                     .value, // 70% progress
-                            backgroundColor: Colors.grey,
+                            backgroundColor: Colors.orange,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).primaryColor,
+                              Colors.grey,
                             ),
-                            strokeWidth: 8.0,
+                            color: Colors.red,
+                            strokeWidth: 4.0,
                           ),
                         )
                         : const SizedBox(),

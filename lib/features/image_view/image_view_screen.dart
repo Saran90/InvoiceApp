@@ -25,7 +25,7 @@ class ImageViewScreen extends StatelessWidget {
           Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.only(top: 48, left: 24),
+              padding: const EdgeInsets.only(top: 24, left: 12),
               child: IconButton(
                 onPressed: _controller.onBackClicked,
                 icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),

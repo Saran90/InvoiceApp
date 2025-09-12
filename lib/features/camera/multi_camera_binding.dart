@@ -7,4 +7,6 @@ class MultiCameraBinding extends Bindings {
   void dependencies() {
     Get.lazyPut(() => MultiCameraController());
   }
+
+
 }

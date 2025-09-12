@@ -27,6 +27,7 @@ class MultiCameraController extends GetxController
 
   @override
   void onInit() {
+    print('MultiCameraController init');
     imageFiles.value = [];
     imageList = [];
     var from = Get.arguments as Map<String, dynamic>?;
@@ -117,6 +118,12 @@ class MultiCameraController extends GetxController
 
   @override
   void dispose() {
+    disposeAll();
+    super.dispose();
+  }
+
+  void disposeAll() {
+    print('MultiCameraController dispose');
     if (cameraController.value != null) {
       cameraController.value!.dispose();
     } else {
@@ -124,6 +131,5 @@ class MultiCameraController extends GetxController
     }
     imageFiles.clear();
     imageList.clear();
-    super.dispose();
   }
 }

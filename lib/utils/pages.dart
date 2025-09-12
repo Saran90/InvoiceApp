@@ -32,7 +32,7 @@ final routes = [
   ),
   GetPage(
     name: multiCameraRoute,
-    binding: MultiCameraBinding(),
+    // binding: MultiCameraBinding(),
     page:
         () => Directionality(
           textDirection: TextDirection.ltr,

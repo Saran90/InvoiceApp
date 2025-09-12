@@ -18,7 +18,7 @@ class MultiCameraScreen extends StatefulWidget {
 }
 
 class _MultiCameraScreenState extends State<MultiCameraScreen> {
-  final _controller = Get.find<MultiCameraController>();
+  final _controller = Get.put<MultiCameraController>(MultiCameraController());
 
   @override
   Widget build(BuildContext context) {
@@ -233,5 +233,11 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    Get.delete<MultiCameraController>();
+    super.dispose();
   }
 }
