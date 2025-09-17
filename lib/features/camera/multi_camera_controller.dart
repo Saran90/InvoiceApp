@@ -2,6 +2,7 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import "package:camera/camera.dart";
+import 'package:get_storage/get_storage.dart';
 
 import 'models/media_model.dart';
 
@@ -22,9 +23,17 @@ class MultiCameraController extends GetxController
   late AnimationController animationController;
   late AnimationController controller;
   Rx<Animation<double>?> scaleAnimation = Rx<Animation<double>?>(null);
+  RxBool isFromInvoice = false.obs;
 
   @override
   void onInit() {
+    print('MultiCameraController init');
+    imageFiles.value = [];
+    imageList = [];
+    var from = Get.arguments as Map<String, dynamic>?;
+    if(from != null) {
+      isFromInvoice.value = (from['from'] == 'invoice');
+    }
     _initCamera();
     currIndex.value = 0;
     super.onInit();
@@ -109,11 +118,18 @@ class MultiCameraController extends GetxController
 
   @override
   void dispose() {
+    disposeAll();
+    super.dispose();
+  }
+
+  void disposeAll() {
+    print('MultiCameraController dispose');
     if (cameraController.value != null) {
       cameraController.value!.dispose();
     } else {
       animationController.dispose();
     }
-    super.dispose();
+    imageFiles.clear();
+    imageList.clear();
   }
 }

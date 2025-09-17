@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:invoice/main.dart';
 
 import '../../utils/routes.dart';
 
@@ -17,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Timer(const Duration(seconds: 3), () {
-      Get.offAndToNamed(invoiceRoute);
+      Get.offAndToNamed(homeRoute);
     });
     super.initState();
   }
