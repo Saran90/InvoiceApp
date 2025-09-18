@@ -5,15 +5,20 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:invoice/features/invoice/models/invoice.dart';
+import 'package:invoice/main.dart';
 import 'package:invoice/utils/extensions.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:stream_isolate/stream_isolate.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:get/get.dart';
 
-import '../../api/api.dart';
 import '../../core/aws_upload.dart';
 import '../../utils/routes.dart';
 import '../camera/models/media_model.dart';
+import '../history/history_controller.dart';
+import '../splash/storage_controller.dart';
 import 'invoice_screen.dart';
 
 class InvoiceController extends GetxController {
@@ -26,6 +31,7 @@ class InvoiceController extends GetxController {
   RxBool isReady = false.obs;
   RxBool isLoading = false.obs;
   RxDouble uploadProgress = 0.0.obs;
+  final _historyController = Get.find<HistoryController>();
 
   @override
   void onInit() {
@@ -95,28 +101,67 @@ class InvoiceController extends GetxController {
     }
   }
 
-  Future<void> savePdf(
-    BuildContext context,
-    File? pdf,
-    bool shouldClose,
-  ) async {
+  Future<void> savePdfBackground(File? pdf) async {
     try {
       if (pdf != null) {
-        var result = await AwsUpload().uploadFile(
-          file: pdf,
-          setUploadProgress: _onUploadProgress,
+        String id = DateTime.timestamp().millisecondsSinceEpoch.toString();
+        Invoice invoice = Invoice(
+          invoiceId: id,
+          filePath: pdf.path,
+          status: 'progress',
+          progress: 0,
         );
-        if (result == '204') {
-          if (shouldClose) {
-            uploadCompleteAndClose(context);
+        _historyController.addInvoice(invoice);
+        final streamIsolate = await StreamIsolate.spawnWithArgument(
+          uploadPdfBackground,
+          argument: [invoice],
+        );
+        uploadComplete();
+        streamIsolate.stream.listen((event) {
+          Invoice? invoice = _historyController.invoices.firstWhereOrNull(
+            (element) => element.invoiceId == event.invoiceId,
+          );
+          if (invoice == null) {
+            _historyController.addInvoice(event);
           } else {
-            uploadComplete();
+            _historyController.updateInvoice(event, event.invoiceId!);
           }
+        });
+        // await for (final i in streamIsolate.stream) {
+        //   print(i);
+        //   streamIsolate.send('received');
+        // }
+        // receivePort.listen((message) {
+        //   print('Result from isolate: $message');
+        //   var invoice = message as Invoice?;
+        //   if(invoice != null) {
+        //     // _historyController.addInvoice(invoice);
+        //     print('Invoices final: ${_historyController.invoices.length}');
+        //     receivePort.close();
+        //     uploadComplete();
+        //   }
+        // });
+      } else {
+        _showMessage(Get.context!, 'PDF not generated');
+      }
+      isLoading.value = false;
+    } catch (exception) {
+      debugPrint('Exception: ${exception.toString()}');
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> savePdf(File? pdf) async {
+    try {
+      if (pdf != null) {
+        var result = await uploadPdf(pdf);
+        if (result == '204') {
+          uploadCompleteAndClose(Get.context!);
         } else {
-          _showMessage(context, 'Upload failed');
+          _showMessage(Get.context!, 'Upload failed');
         }
       } else {
-        _showMessage(context, 'PDF not generated');
+        _showMessage(Get.context!, 'PDF not generated');
       }
       isLoading.value = false;
     } catch (exception) {
@@ -147,6 +192,7 @@ class InvoiceController extends GetxController {
     List<MediaModel>? files =
         await Get.toNamed(multiCameraRoute, arguments: {'from': 'invoice'})
             as List<MediaModel>?;
+    print('Invoices: ${_historyController.invoices.length}');
     if (files != null) {
       images.value = files.map((e) => File(e.file.path)).toList();
       selectedImage.value = images.first;
@@ -160,8 +206,35 @@ class InvoiceController extends GetxController {
     Get.offAndToNamed(homeRoute);
   }
 
-  void _onUploadProgress(int sentBytes, int totalBytes) {
-    uploadProgress.value = (sentBytes / totalBytes);
-    print('Progress: ${uploadProgress.value * 100}%');
+  Future<String> uploadPdf(File pdf) async {
+    var result = await AwsUpload().uploadFile(
+      file: pdf,
+      setUploadProgress: (sentBytes, totalBytes) {
+        uploadProgress.value = (sentBytes / totalBytes);
+        print('Progress: ${uploadProgress.value * 100}%');
+      },
+    );
+    return result;
+  }
+}
+
+Stream<Invoice> uploadPdfBackground(List<dynamic> values) async* {
+  Invoice? invoice = values[0];
+  if(invoice != null) {
+    var result = await AwsUpload().uploadFile(
+      file: File(invoice.filePath ?? ''),
+      setUploadProgress: (sentBytes, totalBytes) async* {
+        double uploadProgress = (sentBytes / totalBytes);
+        invoice.progress = uploadProgress * 100;
+        yield invoice;
+        print('Progress: ${uploadProgress * 100}%');
+      },
+    );
+    if (result == '204') {
+      invoice.status = 'success';
+    } else {
+      invoice.status = 'failed';
+    }
+    yield invoice;
   }
 }

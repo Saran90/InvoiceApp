@@ -10,16 +10,19 @@ import 'package:get/get.dart';
 import 'package:invoice/api/api.dart';
 import 'package:invoice/core/aws_upload.dart';
 import 'package:invoice/features/camera/models/media_model.dart';
+import 'package:invoice/features/history/history_controller.dart';
 import 'package:invoice/utils/extensions.dart';
 import 'package:invoice/utils/routes.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../main.dart';
 import 'invoice_controller.dart';
 
 class InvoiceScreen extends StatelessWidget {
   InvoiceScreen({super.key});
 
   final _controller = Get.find<InvoiceController>();
+  final _historyController = Get.find<HistoryController>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +36,24 @@ class InvoiceScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Invoice',
-                    style: TextStyle(fontSize: 27, fontWeight: FontWeight.w500),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Invoice',
+                        style: TextStyle(
+                          fontSize: 27,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          print('Invoices: ${_historyController?.invoices.length}');
+                          Get.toNamed(historyRoute);
+                        },
+                        icon: Icon(Icons.history, size: 20),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   Expanded(
@@ -82,7 +100,7 @@ class InvoiceScreen extends StatelessWidget {
                               var pdf = await _controller.saveToPdf();
                               if (pdf != null) {
                                 if (await _checkPermission(context)) {
-                                  await _controller.savePdf(context, pdf, true);
+                                  await _controller.savePdf(pdf);
                                 }
                               }
                               _controller.isLoading.value = false;
@@ -118,7 +136,7 @@ class InvoiceScreen extends StatelessWidget {
                               var pdf = await _controller.saveToPdf();
                               if (pdf != null) {
                                 if (await _checkPermission(context)) {
-                                  _controller.savePdf(context, pdf, false);
+                                  _controller.savePdfBackground(pdf);
                                 }
                               }
                             },
@@ -158,15 +176,12 @@ class InvoiceScreen extends StatelessWidget {
                     _controller.isLoading.value
                         ? Center(
                           child: CircularProgressIndicator(
-                            value:
-                                _controller
-                                    .uploadProgress
-                                    .value, // 70% progress
-                            backgroundColor: Colors.orange,
+                            value: _controller.uploadProgress.value,
+                            // 70% progress
+                            backgroundColor: Colors.grey,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.grey,
+                              Colors.orange,
                             ),
-                            color: Colors.red,
                             strokeWidth: 4.0,
                           ),
                         )

@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:invoice/features/camera/multi_camera_binding.dart';
 import 'package:invoice/features/camera/muti_camera_screen.dart';
+import 'package:invoice/features/history/history_binding.dart';
+import 'package:invoice/features/history/history_screen.dart';
 import 'package:invoice/features/home/home_binding.dart';
 import 'package:invoice/features/home/home_screen.dart';
 import 'package:invoice/features/image_view/image_view_binding.dart';
@@ -55,6 +57,15 @@ final routes = [
         () => Directionality(
           textDirection: TextDirection.ltr,
           child: ImageViewScreen(),
+        ),
+  ),
+  GetPage(
+    name: historyRoute,
+    // binding: HistoryBinding(),
+    page:
+        () => Directionality(
+          textDirection: TextDirection.ltr,
+          child: HistoryScreen(),
         ),
   ),
 ];

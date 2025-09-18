@@ -7,8 +7,8 @@ import 'package:invoice/main.dart';
 class AwsUpload {
   Future<String> uploadFile({required File file, required Function(int sentBytes, int totalBytes) setUploadProgress}) async {
     return await AwsS3.uploadFile(
-      accessKey: storage.read('AK'),
-      secretKey: storage.read('SK'),
+      accessKey: 'AKIARVO6ZMZNSLP5T6D5',
+      secretKey: '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',
       file: file,
       contentType: 'application/pdf',
       bucket: "zerosnap-storage-invoiceapp",
