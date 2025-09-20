@@ -27,36 +27,43 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(3, 108, 173, 1),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Center(
-              child: SvgPicture.asset(
-                'assets/images/im_icon.svg',
-                width: 307,
-                height: 97,
+      body: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [
+              Color.fromRGBO(2, 206, 109, 1),
+              Color.fromRGBO(1, 103, 54, 1),
+            ])
+        ),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                child: SvgPicture.asset(
+                  'assets/images/im_icon.svg',
+                  width: 307,
+                  height: 97,
+                ),
               ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text('Powered by', style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white
-                  ),),
-                  Text('Zerosnap ID Solutions Pvt. Ltd.', style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white
-                  )),
-                ],
-              ),
-            )
-          ],
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Powered by', style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white
+                    ),),
+                    Text('Zerosnap ID Solutions Pvt. Ltd.', style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white
+                    )),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

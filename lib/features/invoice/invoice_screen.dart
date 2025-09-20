@@ -130,13 +130,13 @@ class InvoiceScreen extends StatelessWidget {
                                 }
                               },
                               child: SizedBox(
-                                height: 65,
+                                height: 55,
                                 width: 250,
                                 child: Stack(
                                   children: [
                                     SvgPicture.asset(
                                       'assets/images/ic_button.svg',
-                                      height: 65,
+                                      height: 55,
                                       width: 250,
                                     ),
                                     Align(
@@ -144,7 +144,7 @@ class InvoiceScreen extends StatelessWidget {
                                       child: Text(
                                         'Finish',
                                         style: TextStyle(
-                                          fontSize: 27,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.white,
                                         ),
@@ -172,13 +172,13 @@ class InvoiceScreen extends StatelessWidget {
                                 }
                               },
                               child: SizedBox(
-                                height: 65,
+                                height: 55,
                                 width: 250,
                                 child: Stack(
                                   children: [
                                     SvgPicture.asset(
-                                      'assets/images/ic_button.svg',
-                                      height: 65,
+                                      'assets/images/ic_button_blue.svg',
+                                      height: 55,
                                       width: 250,
                                     ),
                                     Align(
@@ -186,7 +186,7 @@ class InvoiceScreen extends StatelessWidget {
                                       child: Text(
                                         'Finish & New',
                                         style: TextStyle(
-                                          fontSize: 27,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.white,
                                         ),
