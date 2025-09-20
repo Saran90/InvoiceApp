@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 30),
                     InkWell(
                       onTap: () {
-                        Get.offAndToNamed(multiCameraRoute);
+                        Get.toNamed(multiCameraRoute);
                       },
                       child: SizedBox(
                         height: 65,

@@ -45,6 +45,7 @@ dependencies:
   aws_s3_upload_lite: ^0.1.6
   get_storage: ^2.1.1
   stream_isolate: ^0.2.0
+  carousel_slider: ^5.1.1
 
 dev_dependencies:
   flutter_test:

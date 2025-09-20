@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
@@ -56,35 +57,52 @@ class InvoiceScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Obx(
-                        () => Wrap(
-                          direction: Axis.horizontal,
-                          runSpacing: 10,
-                          spacing: 10,
-                          children: [
-                            ..._controller.images.map(
-                              (element) => InkWell(
-                                onTap: () {
-                                  _controller.selectedImage.value = element;
-                                  Get.toNamed(
-                                    imageViewRoute,
-                                    arguments: _controller.selectedImage.value,
-                                  );
-                                },
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  child: Image.file(element),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  Expanded(child: Obx(() => CarouselSlider(
+                    options: CarouselOptions(
+                        height: double.infinity,
+                        enableInfiniteScroll: false
                     ),
-                  ),
+                    items: _controller.images.map((i) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                              width: MediaQuery.of(context).size.width,
+                              margin: EdgeInsets.symmetric(horizontal: 5.0),
+                              child: Image.file(i)
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),)),
+                  // Expanded(
+                  //   child: SingleChildScrollView(
+                  //     child: Obx(
+                  //       () => Wrap(
+                  //         direction: Axis.horizontal,
+                  //         runSpacing: 10,
+                  //         spacing: 10,
+                  //         children: [
+                  //           ..._controller.images.map(
+                  //             (element) => InkWell(
+                  //               onTap: () {
+                  //                 _controller.selectedImage.value = element;
+                  //                 Get.toNamed(
+                  //                   imageViewRoute,
+                  //                   arguments: _controller.selectedImage.value,
+                  //                 );
+                  //               },
+                  //               child: SizedBox(
+                  //                 width:
+                  //                     MediaQuery.of(context).size.width * 0.4,
+                  //                 child: Image.file(element),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   const SizedBox(height: 20),
                   Center(
                     child: Container(
@@ -94,77 +112,123 @@ class InvoiceScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          InkWell(
-                            onTap: () async {
-                              _controller.isLoading.value = true;
-                              var pdf = await _controller.saveToPdf();
-                              if (pdf != null) {
-                                if (await _checkPermission(context)) {
-                                  await _controller.savePdf(pdf);
+                          Obx(() => Visibility(
+                            visible: _controller.images.isNotEmpty,
+                            child: InkWell(
+                              onTap: () async {
+                                if(_controller.images.isNotEmpty) {
+                                  _controller.isLoading.value = true;
+                                  var pdf = await _controller.saveToPdf();
+                                  if (pdf != null) {
+                                    if (await _checkPermission(context)) {
+                                      await _controller.savePdf(pdf);
+                                    }
+                                  }
+                                  _controller.isLoading.value = false;
+                                } else {
+                                  _showMessage(context, 'Please add images');
                                 }
-                              }
-                              _controller.isLoading.value = false;
-                            },
-                            child: SizedBox(
-                              height: 65,
-                              width: 250,
-                              child: Stack(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/images/ic_button.svg',
-                                    height: 65,
-                                    width: 250,
-                                  ),
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Finish',
-                                      style: TextStyle(
-                                        fontSize: 27,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
+                              },
+                              child: SizedBox(
+                                height: 65,
+                                width: 250,
+                                child: Stack(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/images/ic_button.svg',
+                                      height: 65,
+                                      width: 250,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Finish',
+                                        style: TextStyle(
+                                          fontSize: 27,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          InkWell(
-                            onTap: () async {
-                              _controller.isLoading.value = true;
-                              var pdf = await _controller.saveToPdf();
-                              if (pdf != null) {
-                                if (await _checkPermission(context)) {
-                                  _controller.savePdfBackground(pdf);
+                          ),),
+                          Obx(() => Visibility(
+                            visible: _controller.images.isNotEmpty,
+                            child: InkWell(
+                              onTap: () async {
+                                if(_controller.images.isNotEmpty) {
+                                  _controller.isLoading.value = true;
+                                  var pdf = await _controller.saveToPdf();
+                                  if (pdf != null) {
+                                    if (await _checkPermission(context)) {
+                                      _controller.savePdfBackground(pdf);
+                                    }
+                                  }
+                                } else {
+                                  _showMessage(context, 'Please add images');
                                 }
-                              }
-                            },
-                            child: SizedBox(
-                              height: 65,
-                              width: 250,
-                              child: Stack(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/images/ic_button.svg',
-                                    height: 65,
-                                    width: 250,
-                                  ),
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Finish & New',
-                                      style: TextStyle(
-                                        fontSize: 27,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white,
+                              },
+                              child: SizedBox(
+                                height: 65,
+                                width: 250,
+                                child: Stack(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/images/ic_button.svg',
+                                      height: 65,
+                                      width: 250,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Finish & New',
+                                        style: TextStyle(
+                                          fontSize: 27,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
+                          ),),
+                          Obx(() => Visibility(
+                            visible: _controller.images.isEmpty,
+                            child: InkWell(
+                              onTap: () async {
+                                _controller.uploadComplete();
+                              },
+                              child: SizedBox(
+                                height: 65,
+                                width: 250,
+                                child: Stack(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/images/ic_button.svg',
+                                      height: 65,
+                                      width: 250,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        'Add New',
+                                        style: TextStyle(
+                                          fontSize: 27,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),)
                         ],
                       ),
                     ),

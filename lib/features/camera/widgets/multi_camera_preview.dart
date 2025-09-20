@@ -11,7 +11,6 @@ import 'package:invoice/features/camera/multi_camera_controller.dart';
 
 /// A widget showing a live camera preview.
 class MultiCameraPreview extends StatelessWidget {
-
   /// The controller for the camera that the preview is shown for.
   final MultiCameraController _controller = Get.find();
 
@@ -23,36 +22,11 @@ class MultiCameraPreview extends StatelessWidget {
       () =>
           _controller.cameraController.value != null
               ? _controller.isCameraInitialized.value
-                  ? AspectRatio(
-                    aspectRatio:
-                        _isLandscape()
-                            ? _controller
-                                .cameraController
-                                .value!
-                                .value
-                                .aspectRatio
-                            : (1 /
-                                _controller
-                                    .cameraController
-                                    .value!
-                                    .value
-                                    .aspectRatio),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: <Widget>[
-                        _wrapInRotatedBox(
-                          child:
-                              _controller.cameraController.value!
-                                  .buildPreview(),
-                        ),
-                        Container(),
-                      ],
-                    ),
+                  ? _wrapInRotatedBox(
+                    child: _controller.cameraController.value!.buildPreview(),
                   )
                   : Container()
-              : Container(
-            color: Colors.green,
-          ),
+              : Container(color: Colors.green),
     );
   }
 

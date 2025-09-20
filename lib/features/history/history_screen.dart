@@ -53,19 +53,19 @@ class HistoryScreen extends StatelessWidget {
                         (context, index) => Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey.shade200,
+                            color: Color.fromRGBO(245, 248, 250, 1),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
                             vertical: 12,
                           ),
                           margin: const EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     historyController
@@ -77,7 +77,46 @@ class HistoryScreen extends StatelessWidget {
                                       color: Colors.black87,
                                     ),
                                   ),
-                                  const SizedBox(height: 5),
+                                  const SizedBox(width: 20),
+                                  historyController.invoices[index].status ==
+                                          'progress'
+                                      ? CircularProgressIndicator(
+                                        value:
+                                            historyController
+                                                .invoices[index]
+                                                .progress
+                                                ?.toDouble() ??
+                                            0,
+                                        backgroundColor: Colors.grey,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.orange,
+                                            ),
+                                        strokeWidth: 4.0,
+                                      )
+                                      : historyController
+                                              .invoices[index]
+                                              .status ==
+                                          'failed'
+                                      ? IconButton(
+                                        onPressed:
+                                            () => historyController.reUpload(
+                                              historyController.invoices[index],
+                                            ),
+                                        icon: Icon(Icons.upload, size: 20),
+                                      )
+                                      : SvgPicture.asset(
+                                        'assets/icons/ic_complete.svg',
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
                                   Text(
                                     historyController.invoices[index].status ??
                                         '',
@@ -90,38 +129,31 @@ class HistoryScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(width: 20),
+                                  // Obx(
+                                  //   () => InkWell(
+                                  //     radius: 30,
+                                  //     onTap: () {
+                                  //       historyController
+                                  //           .invoices[index]
+                                  //           .isExpanded = !historyController
+                                  //               .invoices[index]
+                                  //               .isExpanded!;
+                                  //     },
+                                  //     child: Icon(
+                                  //       (historyController
+                                  //                   .invoices[index]
+                                  //                   .isExpanded ??
+                                  //               false)
+                                  //           ? Icons.keyboard_arrow_up_outlined
+                                  //           : Icons
+                                  //               .keyboard_arrow_down_outlined,
+                                  //       size: 20,
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
-                              const SizedBox(width: 20),
-                              historyController.invoices[index].status ==
-                                      'progress'
-                                  ? CircularProgressIndicator(
-                                    value:
-                                        historyController
-                                            .invoices[index]
-                                            .progress
-                                            ?.toDouble() ??
-                                        0,
-                                    backgroundColor: Colors.grey,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.orange,
-                                    ),
-                                    strokeWidth: 4.0,
-                                  )
-                                  : historyController.invoices[index].status ==
-                                      'failed'
-                                  ? IconButton(
-                                    onPressed:
-                                        () => historyController.reUpload(
-                                          historyController.invoices[index],
-                                        ),
-                                    icon: Icon(Icons.upload, size: 20),
-                                  )
-                                  : SvgPicture.asset(
-                                    'assets/icons/ic_complete.svg',
-                                    width: 20,
-                                    height: 20,
-                                  ),
                             ],
                           ),
                         ),
