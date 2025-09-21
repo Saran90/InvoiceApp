@@ -9,7 +9,6 @@ import 'features/history/history_controller.dart';
 
 void main() {
   runApp(const MyApp());
-  Get.lazyPut(() => HistoryController(),);
   storage.initStorage.then((value) {
     if(value) {
       storage.write('AK', 'AKIARVO6ZMZNSLP5T6D5');
