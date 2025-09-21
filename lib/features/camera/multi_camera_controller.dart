@@ -108,9 +108,13 @@ class MultiCameraController extends GetxController
       return null;
     }
     try {
+      await cameraController.value!.setFocusMode(FocusMode.locked);
+      await cameraController.value!.setExposureMode(ExposureMode.locked);
       final image = await cameraController.value!.takePicture();
       addImages(image);
       HapticFeedback.lightImpact();
+      await cameraController.value!.setFocusMode(FocusMode.auto);
+      await cameraController.value!.setExposureMode(ExposureMode.auto);
     } on CameraException {
       return null;
     }
@@ -126,6 +130,7 @@ class MultiCameraController extends GetxController
     print('MultiCameraController dispose');
     if (cameraController.value != null) {
       cameraController.value!.dispose();
+      cameraController.value = null;
     } else {
       animationController.dispose();
     }

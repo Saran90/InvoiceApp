@@ -17,7 +17,7 @@ class HistoryController extends GetxController {
   }
 
   void addInvoice(Invoice invoice) {
-    invoices.add(invoice);
+    invoices.insert(0, invoice);
   }
 
   void updateInvoice(Invoice invoice, String id) {
@@ -30,7 +30,7 @@ class HistoryController extends GetxController {
   }
 
   reUpload(Invoice selectedInvoice) async {
-    selectedInvoice.status = 'progress';
+    selectedInvoice.status = 'Uploading';
     selectedInvoice.progress = 0;
     updateInvoice(selectedInvoice, selectedInvoice.invoiceId!);
     final streamIsolate = await StreamIsolate.spawnWithArgument(
@@ -43,6 +43,7 @@ class HistoryController extends GetxController {
       );
       if (invoice != null) {
         updateInvoice(event, event.invoiceId!);
+        invoices.refresh();
       }
     });
   }
@@ -55,5 +56,10 @@ class HistoryController extends GetxController {
 
   void onBackClicked() {
     Get.back();
+  }
+
+  void toggleListItem(int index) {
+    invoices[index].isExpanded = !invoices[index].isExpanded!;
+    invoices.refresh();
   }
 }

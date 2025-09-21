@@ -233,6 +233,7 @@ class _MultiCameraScreenState extends State<MultiCameraScreen> {
 
   @override
   void dispose() {
+    _controller.disposeAll();
     Get.delete<MultiCameraController>();
     super.dispose();
   }

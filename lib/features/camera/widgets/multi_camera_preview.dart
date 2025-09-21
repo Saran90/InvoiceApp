@@ -23,7 +23,7 @@ class MultiCameraPreview extends StatelessWidget {
           _controller.cameraController.value != null
               ? _controller.isCameraInitialized.value
                   ? _wrapInRotatedBox(
-                    child: _controller.cameraController.value!.buildPreview(),
+                    child: CameraPreview(_controller.cameraController.value!),
                   )
                   : Container()
               : Container(color: Colors.green),

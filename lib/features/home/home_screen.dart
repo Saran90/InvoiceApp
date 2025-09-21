@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '../../utils/colors.dart';
 import '../../utils/routes.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -17,8 +18,8 @@ class HomeScreen extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
-                    Color.fromRGBO(2, 206, 109, 1),
-                    Color.fromRGBO(1, 103, 54, 1),
+                    gradient1,
+                    gradient2,
                   ])
               ),
               child: Center(

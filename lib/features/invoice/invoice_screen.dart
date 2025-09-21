@@ -17,6 +17,7 @@ import 'package:invoice/utils/routes.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../main.dart';
+import '../../utils/colors.dart';
 import 'invoice_controller.dart';
 
 class InvoiceScreen extends StatelessWidget {
@@ -29,231 +30,306 @@ class InvoiceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 70, right: 5),
+        child: Stack(
+          children: [
+            InkWell(
+              onTap: () => Get.toNamed(historyRoute),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: CircleAvatar(
+                  radius: 30,
+                  backgroundColor: gradient2,
+                  child: Stack(
                     children: [
-                      Text(
-                        'Invoice',
-                        style: TextStyle(
-                          fontSize: 27,
-                          fontWeight: FontWeight.w500,
+                      Obx(() {
+                        int size =
+                            _historyController.invoices
+                                .where((p0) => p0.status == 'Uploading')
+                                .length;
+                        return size > 0
+                            ? Center(
+                              child: Transform.scale(
+                                scale: 1.6,
+                                child: CircularProgressIndicator(
+                                  color: Color.fromRGBO(0, 123, 255, 1),
+                                ),
+                              ),
+                            )
+                            : SizedBox();
+                      }),
+                      Center(
+                        child: Icon(
+                          Icons.cloud_upload,
+                          size: 30,
+                          color: Colors.white,
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          print('Invoices: ${_historyController?.invoices.length}');
-                          Get.toNamed(historyRoute);
-                        },
-                        icon: Icon(Icons.history, size: 20),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Expanded(child: Obx(() => CarouselSlider(
-                    options: CarouselOptions(
-                        height: double.infinity,
-                        enableInfiniteScroll: false
-                    ),
-                    items: _controller.images.map((i) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin: EdgeInsets.symmetric(horizontal: 5.0),
-                              child: Image.file(i)
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),)),
-                  // Expanded(
-                  //   child: SingleChildScrollView(
-                  //     child: Obx(
-                  //       () => Wrap(
-                  //         direction: Axis.horizontal,
-                  //         runSpacing: 10,
-                  //         spacing: 10,
-                  //         children: [
-                  //           ..._controller.images.map(
-                  //             (element) => InkWell(
-                  //               onTap: () {
-                  //                 _controller.selectedImage.value = element;
-                  //                 Get.toNamed(
-                  //                   imageViewRoute,
-                  //                   arguments: _controller.selectedImage.value,
-                  //                 );
-                  //               },
-                  //               child: SizedBox(
-                  //                 width:
-                  //                     MediaQuery.of(context).size.width * 0.4,
-                  //                 child: Image.file(element),
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Container(
-                      height: 150,
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Obx(() => Visibility(
-                            visible: _controller.images.isNotEmpty,
-                            child: InkWell(
-                              onTap: () async {
-                                if(_controller.images.isNotEmpty) {
-                                  _controller.isLoading.value = true;
-                                  var pdf = await _controller.saveToPdf();
-                                  if (pdf != null) {
-                                    if (await _checkPermission(context)) {
-                                      await _controller.savePdf(pdf);
-                                    }
-                                  }
-                                  _controller.isLoading.value = false;
-                                } else {
-                                  _showMessage(context, 'Please add images');
-                                }
-                              },
-                              child: SizedBox(
-                                height: 55,
-                                width: 250,
-                                child: Stack(
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/images/ic_button.svg',
-                                      height: 55,
-                                      width: 250,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Finish',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),),
-                          Obx(() => Visibility(
-                            visible: _controller.images.isNotEmpty,
-                            child: InkWell(
-                              onTap: () async {
-                                if(_controller.images.isNotEmpty) {
-                                  _controller.isLoading.value = true;
-                                  var pdf = await _controller.saveToPdf();
-                                  if (pdf != null) {
-                                    if (await _checkPermission(context)) {
-                                      _controller.savePdfBackground(pdf);
-                                    }
-                                  }
-                                } else {
-                                  _showMessage(context, 'Please add images');
-                                }
-                              },
-                              child: SizedBox(
-                                height: 55,
-                                width: 250,
-                                child: Stack(
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/images/ic_button_blue.svg',
-                                      height: 55,
-                                      width: 250,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Finish & New',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),),
-                          Obx(() => Visibility(
-                            visible: _controller.images.isEmpty,
-                            child: InkWell(
-                              onTap: () async {
-                                _controller.uploadComplete();
-                              },
-                              child: SizedBox(
-                                height: 65,
-                                width: 250,
-                                child: Stack(
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/images/ic_button.svg',
-                                      height: 65,
-                                      width: 250,
-                                    ),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Add New',
-                                        style: TextStyle(
-                                          fontSize: 27,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),)
-                        ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Obx(() {
+                int size =
+                    _historyController.invoices
+                        .where((p0) => p0.status == 'Uploading')
+                        .length;
+                return size != 0
+                    ? CircleAvatar(
+                      radius: 10,
+                      backgroundColor: Colors.red,
+                      child: Center(
+                        child: Text(
+                          '$size',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
+                    )
+                    : SizedBox();
+              }),
+            ),
+          ],
+        ),
+      ),
+      body: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(
+                  top: 50,
+                  left: 10,
+                  bottom: 10,
+                  right: 20,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [gradient1, gradient2],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    'Invoice',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
                     ),
                   ),
-                ],
+                ),
               ),
-              Obx(
-                () =>
-                    _controller.isLoading.value
-                        ? Center(
-                          child: CircularProgressIndicator(
-                            value: _controller.uploadProgress.value,
-                            // 70% progress
-                            backgroundColor: Colors.grey,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.orange,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 24,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: Obx(
+                          () => CarouselSlider(
+                            options: CarouselOptions(
+                              height: double.infinity,
+                              enableInfiniteScroll: false,
                             ),
-                            strokeWidth: 4.0,
+                            items:
+                                _controller.images.map((i) {
+                                  return Builder(
+                                    builder: (BuildContext context) {
+                                      return Container(
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: 5.0,
+                                        ),
+                                        child: Image.file(i),
+                                      );
+                                    },
+                                  );
+                                }).toList(),
                           ),
-                        )
-                        : const SizedBox(),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Container(
+                          height: 150,
+                          color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Obx(
+                                () => Visibility(
+                                  visible: _controller.images.isNotEmpty,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      if (_controller.images.isNotEmpty) {
+                                        _controller.isLoading.value = true;
+                                        var pdf = await _controller.saveToPdf();
+                                        if (pdf != null) {
+                                          if (await _checkPermission(context)) {
+                                            await _controller.savePdf(pdf);
+                                          }
+                                        }
+                                        _controller.isLoading.value = false;
+                                      } else {
+                                        _showMessage(
+                                          context,
+                                          'Please add images',
+                                        );
+                                      }
+                                    },
+                                    child: SizedBox(
+                                      height: 55,
+                                      width: 250,
+                                      child: Stack(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/ic_button.svg',
+                                            height: 55,
+                                            width: 250,
+                                          ),
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Finish',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Obx(
+                                () => Visibility(
+                                  visible: _controller.images.isNotEmpty,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      if (_controller.images.isNotEmpty) {
+                                        _controller.isLoading.value = true;
+                                        var pdf = await _controller.saveToPdf();
+                                        if (pdf != null) {
+                                          if (await _checkPermission(context)) {
+                                            _controller.savePdfBackground(pdf);
+                                          }
+                                        }
+                                      } else {
+                                        _showMessage(
+                                          context,
+                                          'Please add images',
+                                        );
+                                      }
+                                    },
+                                    child: SizedBox(
+                                      height: 55,
+                                      width: 250,
+                                      child: Stack(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/ic_button_blue.svg',
+                                            height: 55,
+                                            width: 250,
+                                          ),
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Finish & New',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Obx(
+                                () => Visibility(
+                                  visible: _controller.images.isEmpty,
+                                  child: InkWell(
+                                    onTap: () async {
+                                      _controller.uploadComplete();
+                                    },
+                                    child: Container(
+                                      height: 55,
+                                      width: 250,
+                                      margin: const EdgeInsets.only(top: 20),
+                                      child: Stack(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/ic_button.svg',
+                                            height: 55,
+                                            width: 250,
+                                          ),
+                                          Align(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              'Add New',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
-        ),
+          Obx(
+            () =>
+                _controller.isLoading.value
+                    ? Center(
+                      child: CircularProgressIndicator(
+                        value: _controller.uploadProgress.value,
+                        // 70% progress
+                        backgroundColor: Colors.grey,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.orange,
+                        ),
+                        strokeWidth: 4.0,
+                      ),
+                    )
+                    : const SizedBox(),
+          ),
+        ],
       ),
     );
   }

@@ -108,7 +108,7 @@ class InvoiceController extends GetxController {
         Invoice invoice = Invoice(
           invoiceId: id,
           filePath: pdf.path,
-          status: 'progress',
+          status: 'Uploading',
           progress: 0,
         );
         _historyController.addInvoice(invoice);
@@ -231,9 +231,9 @@ Stream<Invoice> uploadPdfBackground(List<dynamic> values) async* {
       },
     );
     if (result == '204') {
-      invoice.status = 'success';
+      invoice.status = 'Uploaded';
     } else {
-      invoice.status = 'failed';
+      invoice.status = 'Failed';
     }
     yield invoice;
   }

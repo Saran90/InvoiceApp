@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:invoice/features/history/history_controller.dart';
 import 'package:invoice/main.dart';
 
+import '../../utils/colors.dart';
 import '../../utils/routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -30,8 +31,8 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              Color.fromRGBO(2, 206, 109, 1),
-              Color.fromRGBO(1, 103, 54, 1),
+              gradient1,
+              gradient2,
             ])
         ),
         child: SafeArea(
