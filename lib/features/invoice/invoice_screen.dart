@@ -34,10 +34,10 @@ class InvoiceScreen extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 70, right: 5),
         child: Stack(
           children: [
-            InkWell(
-              onTap: () => Get.toNamed(historyRoute),
-              child: Align(
-                alignment: Alignment.bottomRight,
+            Align(
+              alignment: Alignment.bottomRight,
+              child: InkWell(
+                onTap: () => Get.toNamed(historyRoute),
                 child: CircleAvatar(
                   radius: 30,
                   backgroundColor: gradient2,
