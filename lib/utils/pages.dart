@@ -2,12 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:invoice/features/camera/multi_camera_binding.dart';
 import 'package:invoice/features/camera/muti_camera_screen.dart';
+import 'package:invoice/features/config/config_binding.dart';
+import 'package:invoice/features/config/config_screen.dart';
 import 'package:invoice/features/history/history_binding.dart';
 import 'package:invoice/features/history/history_screen.dart';
 import 'package:invoice/features/home/home_binding.dart';
 import 'package:invoice/features/home/home_screen.dart';
 import 'package:invoice/features/image_view/image_view_binding.dart';
 import 'package:invoice/features/image_view/image_view_screen.dart';
+import 'package:invoice/features/login/login_binding.dart';
+import 'package:invoice/features/login/login_screen.dart';
 import 'package:invoice/utils/routes.dart';
 
 import '../features/invoice/invoice_binding.dart';
@@ -66,6 +70,24 @@ final routes = [
         () => Directionality(
           textDirection: TextDirection.ltr,
           child: HistoryScreen(),
+        ),
+  ),
+  GetPage(
+    name: configRoute,
+    binding: ConfigBinding(),
+    page:
+        () => Directionality(
+          textDirection: TextDirection.ltr,
+          child: ConfigScreen(),
+        ),
+  ),
+  GetPage(
+    name: loginRoute,
+    binding: LoginBinding(),
+    page:
+        () => Directionality(
+          textDirection: TextDirection.ltr,
+          child: LoginScreen(),
         ),
   ),
 ];

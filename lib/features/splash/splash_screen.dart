@@ -20,7 +20,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Timer(const Duration(seconds: 3), () {
-      Get.offAndToNamed(homeRoute);
+      if (appStorage.isLoggedIn() ?? false) {
+        Get.offAndToNamed(homeRoute);
+      } else {
+        Get.offAndToNamed(configRoute);
+      }
     });
     super.initState();
   }
@@ -30,10 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              gradient1,
-              gradient2,
-            ])
+          gradient: LinearGradient(colors: [gradient1, gradient2]),
         ),
         child: SafeArea(
           child: Stack(
@@ -50,19 +51,25 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('Powered by', style: TextStyle(
+                    Text(
+                      'Powered by',
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white
-                    ),),
-                    Text('Zerosnap ID Solutions Pvt. Ltd.', style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Zerosnap ID Solutions Pvt. Ltd.',
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
-                        color: Colors.white
-                    )),
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

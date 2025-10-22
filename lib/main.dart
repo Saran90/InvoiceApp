@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:invoice/api/api.dart';
 import 'package:invoice/features/invoice/models/invoice.dart';
 import 'package:invoice/utils/colors.dart';
 import 'package:invoice/utils/pages.dart';
 import 'package:get/get.dart';
 
-import 'features/history/history_controller.dart';
+import 'api/endpoints.dart';
+import 'data/app_storage.dart';
 
-void main() {
+Future<void> main() async {
+  await GetStorage.init();
   runApp(const MyApp());
-  storage.initStorage.then((value) {
-    if(value) {
-      storage.write('AK', 'AKIARVO6ZMZNSLP5T6D5');
-      storage.write('SK', 'o1jtruGqOd/jWb2+wZoavB2aX/vFBNwemKQdU1I+');
-    }
-  },);
 }
 
-GetStorage storage = GetStorage();
+AppStorage appStorage = AppStorage();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
