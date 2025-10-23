@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:invoice/api/api.dart';
 import 'package:invoice/utils/extensions.dart';
 import 'package:invoice/utils/routes.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../api/error_response.dart';
 import '../../data/error/failures.dart';
@@ -16,6 +17,15 @@ class LoginController extends GetxController {
 
   final Api api = Api(baseUrl: appStorage.getBaseUrl() ?? '');
   RxBool isLoading = RxBool(false);
+  RxString version = RxString('');
+
+  @override
+  void onInit() {
+    super.onInit();
+    PackageInfo.fromPlatform().then((value) {
+      version.value = value.version;
+    });
+  }
 
   Future<void> onLoginClicked() async {
     if (_validateFields()) {

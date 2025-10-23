@@ -60,7 +60,10 @@ class _IconTextFieldState extends State<IconTextField> {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: widget.whiteBackground ? Color(0xFFF5F5F5) : Colors.white10,
+            border: Border.all(
+              color: widget.whiteBackground ? Color(0xFFAEAEAE) : Colors.white10,
+              width: 1
+            )
           ),
           height: widget.isMultiLine ? 100 : widget.height ?? 50,
           width: widget.width ?? double.infinity,
