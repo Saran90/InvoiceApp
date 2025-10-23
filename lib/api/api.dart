@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invoice/api/api_client.dart';
+import 'package:invoice/api/models/url_valid_response.dart';
 import 'package:invoice/main.dart';
 
 import '../data/error/failures.dart';
@@ -20,7 +21,7 @@ class Api extends ApiClient {
     required String password,
     required String companyCode,
   }) async {
-    String baseUrl = appStorage.getBaseUrl()??'';
+    String baseUrl = appStorage.getBaseUrl() ?? '';
     print("Base Url: $baseUrl");
     this.baseUrl = baseUrl;
     try {
@@ -40,6 +41,36 @@ class Api extends ApiClient {
       debugPrint('Login Call: $exception');
       if (exception is DioException) {
         debugPrint('Login Call Exception: ${exception.message}');
+        ErrorResponse? errorResponse = ErrorResponse.fromJson(
+          exception.response?.data,
+        );
+        return Left(APIFailure<ErrorResponse>(error: errorResponse));
+      }
+      return Left(ServerFailure(message: exception.toString()));
+    }
+  }
+
+  Future<Either<Failure, UrlValidResponse?>> urlValid({
+    required String url,
+  }) async {
+    String baseUrl = url;
+    print("Base Url: $baseUrl");
+    this.baseUrl = baseUrl;
+    try {
+      var response = await get('$baseUrl$urlValidUrl');
+      if (response.isOk) {
+        UrlValidResponse urlValidResponse = UrlValidResponse.fromJson(response.body);
+        return Right(urlValidResponse);
+      } else if (response.statusCode == 401) {
+        return Left(ServerFailure(message: loginFailedMessage));
+      } else {
+        ErrorResponse? errorResponse = ErrorResponse.fromJson(response.body);
+        return Left(APIFailure<ErrorResponse>(error: errorResponse));
+      }
+    } catch (exception) {
+      debugPrint('UrlValid Call: $exception');
+      if (exception is DioException) {
+        debugPrint('UrlValid Call Exception: ${exception.message}');
         ErrorResponse? errorResponse = ErrorResponse.fromJson(
           exception.response?.data,
         );

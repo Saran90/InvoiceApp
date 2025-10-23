@@ -14,7 +14,7 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
   final companyCodeController = TextEditingController();
 
-  final Api api = Api(baseUrl: appStorage.getBaseUrl()??'');
+  final Api api = Api(baseUrl: appStorage.getBaseUrl() ?? '');
   RxBool isLoading = RxBool(false);
 
   Future<void> onLoginClicked() async {
@@ -42,12 +42,17 @@ class LoginController extends GetxController {
           isLoading.value = false;
         },
         (r) async {
-          await appStorage.setAccessToken(token: r?.accessToken ?? '');
-          await appStorage.setLoginStatus(status: true);
-          await appStorage.setS3Folder(folder: r?.s3FolderName ?? '');
-          await appStorage.setUserId(userId: r?.userID?.toInt() ?? 0);
-          isLoading.value = false;
-          Get.offAndToNamed(homeRoute);
+          if (r?.status == 1) {
+            await appStorage.setAccessToken(token: r?.accessToken ?? '');
+            await appStorage.setLoginStatus(status: true);
+            await appStorage.setS3Folder(folder: r?.s3FolderName ?? '');
+            await appStorage.setUserId(userId: r?.userID?.toInt() ?? 0);
+            isLoading.value = false;
+            Get.offAndToNamed(homeRoute);
+          } else {
+            isLoading.value = false;
+            Get.context!.showMessage(r?.statusMessage ?? 'Login Failed');
+          }
         },
       );
     }
