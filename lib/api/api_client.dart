@@ -5,7 +5,7 @@ import '../utils/routes.dart';
 
 class ApiClient extends GetConnect implements GetxService {
   final String baseUrl;
-  final bool isAuthenticated;
+  bool isAuthenticated;
 
   ApiClient({required this.baseUrl, this.isAuthenticated = false}) {
     baseUrl = baseUrl;

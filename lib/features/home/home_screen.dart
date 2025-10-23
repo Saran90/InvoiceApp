@@ -4,9 +4,12 @@ import 'package:get/get.dart';
 
 import '../../utils/colors.dart';
 import '../../utils/routes.dart';
+import 'home_controller.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final _controller = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +44,7 @@ class HomeScreen extends StatelessWidget {
                   Image.asset('assets/images/ic_home_image.png', width: 300),
                   const SizedBox(height: 30),
                   InkWell(
-                    onTap: () {
-                      Get.toNamed(multiCameraRoute);
-                    },
+                    onTap: _controller.checkSubscription,
                     child: SizedBox(
                       height: 50,
                       width: 250,
