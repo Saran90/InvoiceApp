@@ -118,14 +118,14 @@ class LoginScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 10,),
-                              Text(
+                              Obx(() => Text(
                                 'v ${_controller.version.value}',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: Color(0xFFb4b4b4),
                                 ),
-                              )
+                              ),)
                             ],
                           ),
                         ),

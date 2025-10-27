@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:invoice/features/invoice/models/invoice.dart';
+import 'package:invoice/main.dart';
 import 'package:stream_isolate/stream_isolate.dart';
 
 import '../invoice/invoice_controller.dart';
@@ -32,10 +33,12 @@ class HistoryController extends GetxController {
   reUpload(Invoice selectedInvoice) async {
     selectedInvoice.status = 'Uploading';
     selectedInvoice.progress = 0;
+    String s3Bucket = appStorage.getS3Folder()??'';
+    int userId = appStorage.getUserId()??0;
     updateInvoice(selectedInvoice, selectedInvoice.invoiceId!);
     final streamIsolate = await StreamIsolate.spawnWithArgument(
       uploadPdfBackground,
-      argument: [selectedInvoice],
+      argument: [selectedInvoice, s3Bucket, userId],
     );
     streamIsolate.stream.listen((event) {
       Invoice? invoice = invoices.firstWhereOrNull(

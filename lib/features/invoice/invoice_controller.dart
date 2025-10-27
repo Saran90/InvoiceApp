@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:invoice/features/invoice/models/invoice.dart';
@@ -14,7 +15,12 @@ import 'package:stream_isolate/stream_isolate.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:get/get.dart';
 
+import '../../api/api.dart';
+import '../../api/error_response.dart';
 import '../../core/aws_upload.dart';
+import '../../data/app_storage.dart';
+import '../../data/error/failures.dart';
+import '../../utils/messages.dart';
 import '../../utils/routes.dart';
 import '../camera/models/media_model.dart';
 import '../history/history_controller.dart';
@@ -32,6 +38,7 @@ class InvoiceController extends GetxController {
   RxBool isLoading = false.obs;
   RxDouble uploadProgress = 0.0.obs;
   final _historyController = Get.find<HistoryController>();
+  final Api api = Api(baseUrl: appStorage.getBaseUrl() ?? '');
 
   @override
   void onInit() {
@@ -111,10 +118,12 @@ class InvoiceController extends GetxController {
           status: 'Uploading',
           progress: 0,
         );
+        String s3Bucket = appStorage.getS3Folder()??'';
+        int userId = appStorage.getUserId()??0;
         _historyController.addInvoice(invoice);
         final streamIsolate = await StreamIsolate.spawnWithArgument(
           uploadPdfBackground,
-          argument: [invoice],
+          argument: [invoice, s3Bucket, userId],
         );
         uploadComplete();
         streamIsolate.stream.listen((event) {
@@ -189,14 +198,7 @@ class InvoiceController extends GetxController {
   Future<void> uploadComplete() async {
     images.value = [];
     selectedImage.value = null;
-    List<MediaModel>? files =
-        await Get.toNamed(multiCameraRoute, arguments: {'from': 'invoice'})
-            as List<MediaModel>?;
-    print('Invoices: ${_historyController.invoices.length}');
-    if (files != null) {
-      images.value = files.map((e) => File(e.file.path)).toList();
-      selectedImage.value = images.first;
-    }
+    checkSubscription();
   }
 
   void uploadCompleteAndClose(BuildContext context) {
@@ -207,8 +209,11 @@ class InvoiceController extends GetxController {
   }
 
   Future<String> uploadPdf(File pdf) async {
+    int userId = appStorage.getUserId()??0;
     var result = await AwsUpload().uploadFile(
       file: pdf,
+      userId: userId,
+      s3Folder: appStorage.getS3Folder()??'',
       setUploadProgress: (sentBytes, totalBytes) {
         uploadProgress.value = (sentBytes / totalBytes);
         print('Progress: ${uploadProgress.value * 100}%');
@@ -216,13 +221,53 @@ class InvoiceController extends GetxController {
     );
     return result;
   }
+
+  Future<void> checkSubscription() async {
+    isLoading.value = true;
+    var result = await api.checkSubscription();
+    result.fold(
+          (l) {
+        if (l is APIFailure) {
+          ErrorResponse? errorResponse = l.error;
+          Get.context!.showMessage(errorResponse?.message ?? apiFailureMessage);
+        } else if (l is ServerFailure) {
+          Get.context!.showMessage(l.message ?? serverFailureMessage);
+        } else if (l is NetworkFailure) {
+          Get.context!.showMessage(networkFailureMessage);
+        } else {
+          Get.context!.showMessage(unknownFailureMessage);
+        }
+        isLoading.value = false;
+      },
+          (r) async {
+        if (r?.status == 1) {
+          isLoading.value = false;
+          List<MediaModel>? files =
+          await Get.toNamed(multiCameraRoute, arguments: {'from': 'invoice'})
+          as List<MediaModel>?;
+          print('Invoices: ${_historyController.invoices.length}');
+          if (files != null) {
+            images.value = files.map((e) => File(e.file.path)).toList();
+            selectedImage.value = images.first;
+          }
+        } else {
+          isLoading.value = false;
+          Get.context!.showMessage(r?.statusMessage ?? 'Please subscribe');
+        }
+      },
+    );
+  }
 }
 
 Stream<Invoice> uploadPdfBackground(List<dynamic> values) async* {
   Invoice? invoice = values[0];
+  String s3Bucket = values[1];
+  int userId = values[2];
   if(invoice != null) {
     var result = await AwsUpload().uploadFile(
       file: File(invoice.filePath ?? ''),
+      s3Folder: s3Bucket,
+      userId: userId,
       setUploadProgress: (sentBytes, totalBytes) async* {
         double uploadProgress = (sentBytes / totalBytes);
         invoice.progress = uploadProgress * 100;
@@ -231,8 +276,10 @@ Stream<Invoice> uploadPdfBackground(List<dynamic> values) async* {
       },
     );
     if (result == '204') {
+      print('Invoice uploaded');
       invoice.status = 'Uploaded';
     } else {
+      print('Invoice upload failed: $result');
       invoice.status = 'Failed';
     }
     yield invoice;

@@ -380,21 +380,13 @@ class InvoiceScreen extends StatelessWidget {
       final android = await plugin.androidInfo;
       if (android.version.sdkInt < 33) {
         if (await Permission.storage.request().isGranted) {
-          if (await Permission.manageExternalStorage.request().isGranted) {
-            return true;
-          } else {
-            _showMessage(context, 'Manage storage permission denied');
-          }
+          return true;
         } else {
           _showMessage(context, 'Storage permission denied');
         }
       } else {
         if (await Permission.photos.request().isGranted) {
-          if (await Permission.manageExternalStorage.request().isGranted) {
-            return true;
-          } else {
-            _showMessage(context, 'Manage storage permission denied');
-          }
+          return true;
         } else {
           _showMessage(context, 'Photos permission denied');
         }

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:invoice/api/constants.dart';
 
 import '../main.dart';
 import '../utils/routes.dart';
@@ -13,6 +14,7 @@ class ApiClient extends GetConnect implements GetxService {
 
   @override
   void onInit() {
+    timeout = Duration(seconds: 20);
     httpClient.addRequestModifier<void>((request) {
       String? accessToken = appStorage.getAccessToken();
       if (accessToken != null && accessToken.isNotEmpty) {

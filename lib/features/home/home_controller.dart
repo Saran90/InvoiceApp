@@ -36,7 +36,7 @@ class HomeController extends GetxController {
           Get.toNamed(multiCameraRoute);
         } else {
           isLoading.value = false;
-          Get.context!.showMessage(r?.statusMessage ?? 'Please subscribe to continue');
+          Get.context!.showMessage(r?.statusMessage ?? 'Please subscribe');
         }
       },
     );
