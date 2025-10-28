@@ -12,6 +12,8 @@ import 'package:invoice/features/image_view/image_view_binding.dart';
 import 'package:invoice/features/image_view/image_view_screen.dart';
 import 'package:invoice/features/login/login_binding.dart';
 import 'package:invoice/features/login/login_screen.dart';
+import 'package:invoice/features/settings/settings_binding.dart';
+import 'package:invoice/features/settings/settings_screen.dart';
 import 'package:invoice/utils/routes.dart';
 
 import '../features/invoice/invoice_binding.dart';
@@ -88,6 +90,15 @@ final routes = [
         () => Directionality(
           textDirection: TextDirection.ltr,
           child: LoginScreen(),
+        ),
+  ),
+  GetPage(
+    name: settingsRoute,
+    binding: SettingsBinding(),
+    page:
+        () => Directionality(
+          textDirection: TextDirection.ltr,
+          child: SettingsScreen(),
         ),
   ),
 ];

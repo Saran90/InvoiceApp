@@ -79,7 +79,7 @@ class Api extends ApiClient {
         );
         return Left(APIFailure<ErrorResponse>(error: errorResponse));
       }
-      return Left(ServerFailure(message: exception.toString()));
+      return Left(ServerFailure(message: 'Invalid url'));
     }
   }
 

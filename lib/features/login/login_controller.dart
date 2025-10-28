@@ -55,6 +55,7 @@ class LoginController extends GetxController {
           if (r?.status == 1) {
             await appStorage.setAccessToken(token: r?.accessToken ?? '');
             await appStorage.setLoginStatus(status: true);
+            await appStorage.setUsername(username: r?.username ?? '');
             await appStorage.setS3Folder(folder: r?.s3FolderName ?? '');
             print('S3 folder login: ${appStorage.getS3Folder()}');
             await appStorage.setUserId(userId: r?.userID?.toInt() ?? 0);

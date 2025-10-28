@@ -20,17 +20,27 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    gradient1,
-                    gradient2,
-                  ])
+                gradient: LinearGradient(colors: [gradient1, gradient2]),
               ),
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/images/im_icon.svg',
-                  width: 307,
-                  height: 97,
-                ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: SvgPicture.asset(
+                      'assets/images/im_icon.svg',
+                      width: 307,
+                      height: 97,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50,right: 30),
+                      child: InkWell(
+                          onTap: () => Get.toNamed(settingsRoute),
+                          child: SvgPicture.asset('assets/icons/ic_settings.svg')),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -74,7 +84,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20,),
+          const SizedBox(height: 20),
         ],
       ),
     );

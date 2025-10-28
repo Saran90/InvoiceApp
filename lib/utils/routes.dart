@@ -5,3 +5,4 @@ const homeRoute = '/home';
 const imageViewRoute = '/imageView';
 const historyRoute = '/history';
 const configRoute = '/config';
+const settingsRoute = '/settings';

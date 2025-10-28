@@ -14,7 +14,7 @@ class ConfigScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.max,
@@ -40,40 +40,48 @@ class ConfigScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Stack(
-              children: [
-                Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+            Container(
+              height: Get.height*0.6,
+              color: Colors.white,
+              child: Stack(
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 20),
-                          Text(
-                            'Welcome!',
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Welcome!',
+                                  style: TextStyle(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Verify Your Domain to continue',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF02AC5B),
+                                  ),
+                                  maxLines: 2,
+                                ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            'Verify Your Domain to continue',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF02AC5B),
-                            ),
-                            maxLines: 2,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 40),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
                           children: [
                             IconTextField(
@@ -109,26 +117,26 @@ class ConfigScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            Obx(() => Text(
-                              'v ${_controller.version.value}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFFb4b4b4),
-                              ),
-                            ),),
                           ],
                         ),
                       ),
+                      Obx(() => Text(
+                        'v ${_controller.version.value}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFb4b4b4),
+                        ),
+                      ),),
                     ],
                   ),
-                ),
-                Obx(() => Visibility(
-                    visible: _controller.isLoading.value,
-                    child: Center(child: CircularProgressIndicator(
-                      color: gradient2,
-                    ))),),
-              ],
+                  Obx(() => Visibility(
+                      visible: _controller.isLoading.value,
+                      child: Center(child: CircularProgressIndicator(
+                        color: gradient2,
+                      ))),),
+                ],
+              ),
             ),
           ],
         ),

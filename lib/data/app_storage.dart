@@ -27,6 +27,10 @@ class AppStorage {
     await box.write(accessTokenKey, token);
   }
 
+  Future<void> setUsername({required String username}) async {
+    await box.write(usernameKey, username);
+  }
+
   int? getUserId() {
     int? userId = box.read(userIdKey);
     return userId;
@@ -39,6 +43,11 @@ class AppStorage {
   String? getBaseUrl() {
     String? url = box.read(baseUrlKey);
     return url;
+  }
+
+  String? getUsername() {
+    String? username = box.read(usernameKey);
+    return username;
   }
 
   Future<void> setUserId({required int userId}) async {
